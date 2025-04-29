@@ -3,7 +3,6 @@
 #include "src/Constants.h"
 
 TileSet::TileSet() : path(EMPTY_STRING), tileWidth(DEFAULT_TILE_WIDTH), tileHeight(DEFAULT_TILE_HEIGHT) {
-    AREA_HEIGHT = GetScreenHeight() - SELECTED_TILES_AREA_HEIGHT;
     selectedCells = std::vector<TileSetCell>();
 }
 
@@ -17,13 +16,19 @@ void TileSet::loadTexture(const std::string &texturePath) {
 }
 
 void TileSet::draw() const {
-    BeginScissorMode(0, 0, TILESET_AREA_WIDTH, AREA_HEIGHT);
+    BeginScissorMode(0, 0, TILESET_AREA_WIDTH, GetScreenHeight());
+
+    DrawRectangle(0, TILESET_AREA_VERTICAL_POSITION, TILESET_AREA_WIDTH, GetScreenHeight(), TILESET_AREA_COLOR);
+
     BeginMode2D(camera);
 
     DrawTexture(texture, 0, 0, WHITE);
     drawGrid();
 
     EndMode2D();
+
+    DrawLine(TILESET_AREA_WIDTH, TILESET_AREA_VERTICAL_POSITION, TILESET_AREA_WIDTH, GetScreenHeight(), LIGHTGRAY);
+
     EndScissorMode();
 }
 

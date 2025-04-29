@@ -7,12 +7,10 @@
 #include "src/Constants.h"
 
 class TileSet {
-    unsigned int AREA_HEIGHT;
-
     std::string path;
     Texture2D texture = {};
     Camera2D camera = {
-        .offset = {TILESET_DEFAULT_X, TILESET_DEFAULT_Y},
+        .offset = {TILESET_HORIZONTAL_PADDING, TILESET_AREA_VERTICAL_POSITION + TILESET_VERTICAL_PADDING},
         .zoom = 1
     };
 

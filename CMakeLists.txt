@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(IMGUI_VERSION 1.91.8)
 add_executable(MoonMap main.cpp
+        src/menubar/MenuBar.cpp
+        src/menubar/MenuBar.h
         src/tileset/TileSet.h
         src/tileset/TileSetCell.h
         src/tileset/TileSet.cpp
