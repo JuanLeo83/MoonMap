@@ -2,10 +2,15 @@
 
 #include <raylib.h>
 
+#include "src/tileset/TileSet.h"
+
 int main() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1280, 720, "MoonMap");
     // SetExitKey(0);
+
+    const auto tileset = new TileSet();
+    tileset->loadTexture("assets/AutotileExample.png");
 
     while (!WindowShouldClose()) {
         // update
@@ -14,11 +19,14 @@ int main() {
         ClearBackground(DARKGRAY);
 
         // draw
+        tileset->draw();
 
         DrawFPS(10, GetScreenHeight() - 20);
 
         EndDrawing();
     }
+
+    delete tileset;
 
     return 0;
 }

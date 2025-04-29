@@ -5,6 +5,13 @@ include(FetchContent)
 set(CMAKE_CXX_STANDARD 17)
 
 set(IMGUI_VERSION 1.91.8)
+add_executable(MoonMap main.cpp
+        src/tileset/TileSet.h
+        src/tileset/TileSetCell.h
+        src/tileset/TileSet.cpp
+        src/Constants.h
+)
+
 FetchContent_Declare(
         imgui
         URL https://github.com/ocornut/imgui/archive/refs/tags/v${IMGUI_VERSION}-docking.tar.gz
@@ -44,12 +51,6 @@ target_include_directories(ImGuiFileDialog PUBLIC
 )
 
 target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
-
-add_executable(MoonMap main.cpp
-        src/tileset/TileSet.h
-        src/tileset/TileSetCell.h
-        src/tileset/TileSet.cpp
-)
 
 target_sources(MoonMap PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/rlImGui/rlImGui.cpp
