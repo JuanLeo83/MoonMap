@@ -6,7 +6,8 @@
 
 TileSet::TileSet() : tileWidth(DEFAULT_TILE_WIDTH), tileHeight(DEFAULT_TILE_HEIGHT) {
     gui = new TileSetGui(tileWidth, tileHeight, tileSetList, selectedTileSetIndex,
-                         [this](const std::string &path) { loadTexture(path); });
+    [this](const std::string &path) { addTileSet(path); },
+    [this](const int index) { deleteTileSet(index); });
     selectedCells = std::vector<TileSetCell>();
 }
 
@@ -17,7 +18,7 @@ TileSet::~TileSet() {
     }
 }
 
-void TileSet::loadTexture(const std::string &texturePath) {
+void TileSet::addTileSet(const std::string &texturePath) {
     const TileSetTexture tileSetTexture = {
         .path = texturePath,
         .texture = LoadTexture(texturePath.c_str())
@@ -26,6 +27,20 @@ void TileSet::loadTexture(const std::string &texturePath) {
     tileSetList.push_back(tileSetTexture);
 
     if (selectedTileSetIndex == -1 || tileSetList.size() == 1) {
+        selectedTileSetIndex = tileSetList.size() - 1;
+    }
+}
+
+void TileSet::deleteTileSet(int index) {
+    if (index < 0 || index >= tileSetList.size()) return;
+
+    UnloadTexture(tileSetList[index].texture);
+
+    tileSetList.erase(tileSetList.begin() + index);
+
+    if (tileSetList.empty()) {
+        selectedTileSetIndex = -1;
+    } else if (selectedTileSetIndex >= tileSetList.size()) {
         selectedTileSetIndex = tileSetList.size() - 1;
     }
 }
@@ -45,8 +60,6 @@ void TileSet::draw() const {
     EndMode2D();
 
     gui->draw();
-
-    DrawLine(TILESET_AREA_WIDTH, TILESET_AREA_VERTICAL_POSITION, TILESET_AREA_WIDTH, GetScreenHeight(), LIGHTGRAY);
 
     EndScissorMode();
 }

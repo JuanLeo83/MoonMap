@@ -9,10 +9,13 @@
 
 TileSetGui::TileSetGui(int &tileWidth, int &tileHeight, std::vector<TileSetTexture> &tileSetList,
                        int &selectedTileSetIndex,
-                       std::function<void(const std::string &)> onAddTileSet) : tileWidth(tileWidth),
-    tileHeight(tileHeight),
-    tileSetList(tileSetList), selectedTileSetIndex(selectedTileSetIndex),
-    onAddTileSet(std::move(onAddTileSet)) {
+                       std::function<void(const std::string &)> onAddTileSet,
+                       std::function<void(int)> onDeleteTileSet) : tileWidth(tileWidth),
+                                                                   tileHeight(tileHeight),
+                                                                   tileSetList(tileSetList),
+                                                                   selectedTileSetIndex(selectedTileSetIndex),
+                                                                   onAddTileSet(std::move(onAddTileSet)),
+                                                                   onDeleteTileSet(std::move(onDeleteTileSet)) {
 }
 
 void TileSetGui::draw() {
@@ -26,7 +29,6 @@ void TileSetGui::draw() {
             for (int idx = 0; idx < tileSetList.size(); ++idx) {
                 if (ImGui::BeginTabItem(std::to_string(idx + 1).c_str())) {
                     if (selectedTileSetIndex != idx) {
-                        std::cout << "Selected: " << idx + 1 << std::endl;
                         selectedTileSetIndex = idx;
                     }
                     ImGui::EndTabItem();
@@ -41,6 +43,12 @@ void TileSetGui::draw() {
             config.path = ".";
             ImGuiFileDialog::Instance()->OpenDialog(SELECT_TILESET, "Choose File", ".png,.jpeg,.jpg,.*", config);
         }
+        ImGui::SameLine();
+        ImGui::BeginDisabled(tileSetList.empty() || selectedTileSetIndex < 0);
+        if (ImGui::Button("Delete tileset") && !tileSetList.empty() && selectedTileSetIndex >= 0) {
+            onDeleteTileSet(selectedTileSetIndex);
+        }
+        ImGui::EndDisabled();
 
         ImGui::SetNextItemWidth(100);
         ImGui::InputInt("Tile width", &tileWidth);
@@ -58,7 +66,6 @@ void TileSetGui::selectTileSetDialog() const {
     const auto maxSize = ImVec2(GetScreenWidth() * 0.75f, GetScreenHeight() * 0.75f);
     constexpr auto minSize = ImVec2(600, 400);
     if (ImGuiFileDialog::Instance()->Display(SELECT_TILESET, ImGuiWindowFlags_NoCollapse, minSize, maxSize)) {
-
         if (ImGuiFileDialog::Instance()->IsOk()) {
             onAddTileSet(ImGuiFileDialog::Instance()->GetFilePathName());
         }

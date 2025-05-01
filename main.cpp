@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <raylib.h>
 
 #include "imgui.h"
@@ -27,7 +25,7 @@ int main() {
         // update
 
         BeginDrawing();
-        ClearBackground(DARKGRAY);
+        ClearBackground(Color{68, 71, 90});
         rlImGuiBegin();
 
         ImGui::PushStyleColor(ImGuiCol_WindowBg, MENU_BAR_COLOR);
@@ -53,8 +51,8 @@ int main() {
 
         ImGui::PopStyleColor(13);
 
-        DrawFPS(GetScreenWidth() - 100, 10);
         rlImGuiEnd();
+        DrawFPS(GetScreenWidth() - 100, 10);
         EndDrawing();
     }
 

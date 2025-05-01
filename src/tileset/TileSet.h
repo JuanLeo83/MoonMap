@@ -34,7 +34,9 @@ public:
 
     ~TileSet();
 
-    void loadTexture(const std::string &texturePath);
+    void addTileSet(const std::string &texturePath);
+
+    void deleteTileSet(int index);
 
     void draw() const;
 
