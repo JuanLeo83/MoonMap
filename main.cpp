@@ -28,13 +28,29 @@ int main() {
 
         BeginDrawing();
         ClearBackground(DARKGRAY);
+        rlImGuiBegin();
+
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, MENU_BAR_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_Button, BUTTON_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, BUTTON_HOVERED_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, BUTTON_ACTIVE_COLOR);
+
+        ImGui::PushStyleColor(ImGuiCol_MenuBarBg, MENU_BAR_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_PopupBg, MENU_BAR_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_Border, MENU_BAR_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_Header, BUTTON_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, BUTTON_HOVERED_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, BUTTON_ACTIVE_COLOR);
 
         // draw
         tileset->draw();
+
         menuBar->draw();
 
-        DrawFPS(10, GetScreenHeight() - 20);
+        ImGui::PopStyleColor(10);
 
+        DrawFPS(GetScreenWidth() - 100, 10);
+        rlImGuiEnd();
         EndDrawing();
     }
 

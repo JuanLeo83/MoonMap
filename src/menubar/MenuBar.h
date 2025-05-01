@@ -2,6 +2,8 @@
 
 
 class MenuBar {
+    void drawMenuBar() const;
+
 public:
     explicit MenuBar();
 

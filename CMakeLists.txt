@@ -11,6 +11,8 @@ add_executable(MoonMap main.cpp
         src/tileset/TileSet.h
         src/tileset/TileSetCell.h
         src/tileset/TileSet.cpp
+        src/tileset/TileSetGui.cpp
+        src/tileset/TileSetGui.h
         src/Constants.h
 )
 

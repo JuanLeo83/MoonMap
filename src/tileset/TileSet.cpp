@@ -3,10 +3,12 @@
 #include "src/Constants.h"
 
 TileSet::TileSet() : path(EMPTY_STRING), tileWidth(DEFAULT_TILE_WIDTH), tileHeight(DEFAULT_TILE_HEIGHT) {
+    gui = new TileSetGui(tileWidth, tileHeight);
     selectedCells = std::vector<TileSetCell>();
 }
 
 TileSet::~TileSet() {
+    delete gui;
     UnloadTexture(texture);
 }
 
@@ -26,6 +28,8 @@ void TileSet::draw() const {
     drawGrid();
 
     EndMode2D();
+
+    gui->draw();
 
     DrawLine(TILESET_AREA_WIDTH, TILESET_AREA_VERTICAL_POSITION, TILESET_AREA_WIDTH, GetScreenHeight(), LIGHTGRAY);
 

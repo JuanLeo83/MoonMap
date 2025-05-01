@@ -3,41 +3,47 @@
 #include "imgui.h"
 #include <raylib.h>
 
-#include "rlImGui.h"
-#include "src/Constants.h"
-
 MenuBar::MenuBar() {
 }
 
 void MenuBar::draw() const {
-    rlImGuiBegin();
-
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(GetScreenWidth(), MENU_BAR_HEIGHT), ImGuiCond_Always);
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(40.0f / 256, 42.0f / 256, 54.0f / 256, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(189.0f / 256, 147.0f / 256, 249.0f / 256, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(189.0f / 256, 118.0f / 256, 245.0f / 256, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(189.0f / 256, 168.0f / 256, 247.0f / 256, 1.0f));
+    ImGui::SetNextWindowSize(ImVec2(GetScreenWidth(), 0), ImGuiCond_Always);
 
-    if (ImGui::Begin("TileSet Controls", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar)) {
-        if (ImGui::Button("New map")) {
-
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Load map")) {
-
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Save map")) {
-
-        }
+    if (ImGui::Begin("MenuBar", nullptr,
+                     ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+                     ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration)) {
+        drawMenuBar();
     }
     ImGui::End();
-    ImGui::PopStyleColor(4);
+}
 
-    rlImGuiEnd();
+void MenuBar::drawMenuBar() const {
 
-    DrawLine(0, MENU_BAR_HEIGHT + 1, GetScreenWidth(), MENU_BAR_HEIGHT + 1, LIGHTGRAY);
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("New map")) {
+
+            }
+            if (ImGui::MenuItem("Load map")) {
+
+            }
+            if (ImGui::MenuItem("Save map")) {
+
+            }
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Editar")) {
+            if (ImGui::MenuItem("Copiar")) {
+
+            }
+            if (ImGui::MenuItem("Pegar")) {
+
+            }
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenuBar();
+    }
 }

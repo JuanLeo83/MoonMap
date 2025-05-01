@@ -4,9 +4,12 @@
 #include <vector>
 
 #include "TileSetCell.h"
+#include "TileSetGui.h"
 #include "src/Constants.h"
 
 class TileSet {
+    TileSetGui *gui;
+
     std::string path;
     Texture2D texture = {};
     Camera2D camera = {
@@ -14,8 +17,8 @@ class TileSet {
         .zoom = 1
     };
 
-    unsigned int tileWidth;
-    unsigned int tileHeight;
+    int tileWidth;
+    int tileHeight;
 
     bool isGridEnabled = true;
     Color gridColor = DEFAULT_GRID_COLOR;
