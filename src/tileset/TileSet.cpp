@@ -1,20 +1,33 @@
 #include "TileSet.h"
 
+#include <iostream>
+
 #include "src/Constants.h"
 
-TileSet::TileSet() : path(EMPTY_STRING), tileWidth(DEFAULT_TILE_WIDTH), tileHeight(DEFAULT_TILE_HEIGHT) {
-    gui = new TileSetGui(tileWidth, tileHeight);
+TileSet::TileSet() : tileWidth(DEFAULT_TILE_WIDTH), tileHeight(DEFAULT_TILE_HEIGHT) {
+    gui = new TileSetGui(tileWidth, tileHeight, tileSetList, selectedTileSetIndex,
+                         [this](const std::string &path) { loadTexture(path); });
     selectedCells = std::vector<TileSetCell>();
 }
 
 TileSet::~TileSet() {
     delete gui;
-    UnloadTexture(texture);
+    for (const auto &tileSetTexture: tileSetList) {
+        UnloadTexture(tileSetTexture.texture);
+    }
 }
 
 void TileSet::loadTexture(const std::string &texturePath) {
-    path = texturePath;
-    texture = LoadTexture(path.c_str());
+    const TileSetTexture tileSetTexture = {
+        .path = texturePath,
+        .texture = LoadTexture(texturePath.c_str())
+    };
+
+    tileSetList.push_back(tileSetTexture);
+
+    if (selectedTileSetIndex == -1 || tileSetList.size() == 1) {
+        selectedTileSetIndex = tileSetList.size() - 1;
+    }
 }
 
 void TileSet::draw() const {
@@ -24,8 +37,10 @@ void TileSet::draw() const {
 
     BeginMode2D(camera);
 
-    DrawTexture(texture, 0, 0, WHITE);
-    drawGrid();
+    if (!tileSetList.empty() && selectedTileSetIndex >= 0 && selectedTileSetIndex < tileSetList.size()) {
+        DrawTexture(tileSetList[selectedTileSetIndex].texture, 0, 0, WHITE);
+        drawGrid();
+    }
 
     EndMode2D();
 
@@ -39,11 +54,11 @@ void TileSet::draw() const {
 void TileSet::drawGrid() const {
     if (tileWidth == 0 || tileHeight == 0) return;
 
-    for (unsigned int vertical = 0; vertical <= texture.width; vertical += tileWidth) {
-        DrawLine(vertical, 0, vertical, texture.height, gridColor);
+    for (unsigned int vertical = 0; vertical <= tileSetList[selectedTileSetIndex].texture.width; vertical += tileWidth) {
+        DrawLine(vertical, 0, vertical, tileSetList[selectedTileSetIndex].texture.height, gridColor);
     }
 
-    for (unsigned int horizontal = 0; horizontal <= texture.height; horizontal += tileHeight) {
-        DrawLine(0, horizontal, texture.width, horizontal, gridColor);
+    for (unsigned int horizontal = 0; horizontal <= tileSetList[selectedTileSetIndex].texture.height; horizontal += tileHeight) {
+        DrawLine(0, horizontal, tileSetList[selectedTileSetIndex].texture.width, horizontal, gridColor);
     }
 }

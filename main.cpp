@@ -21,7 +21,7 @@ int main() {
     const MenuBar *menuBar = new MenuBar();
 
     const auto tileset = new TileSet();
-    tileset->loadTexture("assets/AutotileExample.png");
+    // tileset->loadTexture("assets/AutotileExample.png");
 
     while (!WindowShouldClose()) {
         // update
@@ -42,12 +42,16 @@ int main() {
         ImGui::PushStyleColor(ImGuiCol_HeaderHovered, BUTTON_HOVERED_COLOR);
         ImGui::PushStyleColor(ImGuiCol_HeaderActive, BUTTON_ACTIVE_COLOR);
 
+        ImGui::PushStyleColor(ImGuiCol_Tab, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_TabHovered, BUTTON_HOVERED_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_TabActive, BUTTON_ACTIVE_COLOR);
+
         // draw
         tileset->draw();
 
         menuBar->draw();
 
-        ImGui::PopStyleColor(10);
+        ImGui::PopStyleColor(13);
 
         DrawFPS(GetScreenWidth() - 100, 10);
         rlImGuiEnd();

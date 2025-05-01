@@ -5,13 +5,15 @@
 
 #include "TileSetCell.h"
 #include "TileSetGui.h"
+#include "TileSetTexture.h"
 #include "src/Constants.h"
 
 class TileSet {
     TileSetGui *gui;
 
-    std::string path;
-    Texture2D texture = {};
+    std::vector<TileSetTexture> tileSetList;
+    int selectedTileSetIndex = -1;
+
     Camera2D camera = {
         .offset = {TILESET_HORIZONTAL_PADDING, TILESET_AREA_VERTICAL_POSITION + TILESET_VERTICAL_PADDING},
         .zoom = 1

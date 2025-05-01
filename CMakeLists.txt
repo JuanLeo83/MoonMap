@@ -8,11 +8,12 @@ set(IMGUI_VERSION 1.91.8)
 add_executable(MoonMap main.cpp
         src/menubar/MenuBar.cpp
         src/menubar/MenuBar.h
+        src/tileset/TileSet.cpp
         src/tileset/TileSet.h
         src/tileset/TileSetCell.h
-        src/tileset/TileSet.cpp
         src/tileset/TileSetGui.cpp
         src/tileset/TileSetGui.h
+        src/tileset/TileSetTexture.h
         src/Constants.h
 )
 
