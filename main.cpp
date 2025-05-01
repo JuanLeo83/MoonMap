@@ -1,3 +1,4 @@
+#include <iostream>
 #include <raylib.h>
 
 #include "imgui.h"
@@ -16,7 +17,14 @@ int main() {
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.IniFilename = nullptr;
 
-    const MenuBar *menuBar = new MenuBar();
+    auto menuBar = new MenuBar(
+        [](const int newValue) {
+            std::cout << "Map width: " << newValue << std::endl;
+        },
+        [](const int newValue) {
+            std::cout << "Map height: " << newValue << std::endl;
+        }
+        );
 
     const auto tileset = new TileSet();
     // tileset->loadTexture("assets/AutotileExample.png");
@@ -40,16 +48,20 @@ int main() {
         ImGui::PushStyleColor(ImGuiCol_HeaderHovered, BUTTON_HOVERED_COLOR);
         ImGui::PushStyleColor(ImGuiCol_HeaderActive, BUTTON_ACTIVE_COLOR);
 
-        ImGui::PushStyleColor(ImGuiCol_Tab, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Tab, BUTTON_ACTIVE_COLOR);
         ImGui::PushStyleColor(ImGuiCol_TabHovered, BUTTON_HOVERED_COLOR);
-        ImGui::PushStyleColor(ImGuiCol_TabActive, BUTTON_ACTIVE_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_TabActive, SELECTION_COLOR);
+
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, FRAME_BACKGROUND_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, FRAME_BACKGROUND_HOVERED_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, FRAME_BACKGROUND_ACTIVE_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, SELECTION_COLOR);
 
         // draw
         tileset->draw();
-
         menuBar->draw();
 
-        ImGui::PopStyleColor(13);
+        ImGui::PopStyleColor(17);
 
         rlImGuiEnd();
         DrawFPS(GetScreenWidth() - 100, 10);
