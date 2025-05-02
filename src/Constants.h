@@ -16,6 +16,7 @@ constexpr ImVec4 FRAME_BACKGROUND_COLOR = {0.2f, 0.2f, 0.2f, 1.0f};
 constexpr ImVec4 FRAME_BACKGROUND_HOVERED_COLOR = {0.3f, 0.3f, 0.3f, 1.0f};
 constexpr ImVec4 FRAME_BACKGROUND_ACTIVE_COLOR = {0.4f, 0.4f, 0.4f, 1.0f};
 
+constexpr Color SELECTED_TILE_COLOR = {255, 121, 198, 255};
 
 constexpr unsigned int TILESET_HORIZONTAL_PADDING = 10;
 constexpr unsigned int TILESET_VERTICAL_PADDING = 10;

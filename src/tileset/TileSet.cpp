@@ -52,8 +52,8 @@ void TileSet::update() {
 
     const float deltaTime = GetFrameTime();
 
-    camera.zoom = tileSetList[selectedTileSetIndex].cameraZoom;
-    camera.target = tileSetList[selectedTileSetIndex].cameraTarget;
+    camera.zoom = getSelectedTileSet().cameraZoom;
+    camera.target = getSelectedTileSet().cameraTarget;
 
     mousePosition = GetMousePosition();
     worldPositionTileSet = GetScreenToWorld2D(mousePosition, camera);
@@ -64,10 +64,14 @@ void TileSet::update() {
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) || IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
             moveCamera();
         }
+
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && isMouseInsideTileSet()) {
+            selectTile();
+        }
     }
 
-    tileSetList[selectedTileSetIndex].cameraZoom = camera.zoom;
-    tileSetList[selectedTileSetIndex].cameraTarget = camera.target;
+    getSelectedTileSet().cameraZoom = camera.zoom;
+    getSelectedTileSet().cameraTarget = camera.target;
 }
 
 void TileSet::draw() const {
@@ -78,8 +82,9 @@ void TileSet::draw() const {
     BeginMode2D(camera);
 
     if (!tileSetList.empty() && selectedTileSetIndex >= 0 && selectedTileSetIndex < tileSetList.size()) {
-        DrawTexture(tileSetList[selectedTileSetIndex].texture, 0, 0, WHITE);
+        DrawTexture(getSelectedTileSet().texture, 0, 0, WHITE);
         drawGrid();
+        drawSelectedTile();
     }
 
     EndMode2D();
@@ -92,14 +97,14 @@ void TileSet::draw() const {
 void TileSet::drawGrid() const {
     if (tileWidth == 0 || tileHeight == 0) return;
 
-    for (unsigned int vertical = 0; vertical <= tileSetList[selectedTileSetIndex].texture.width;
+    for (unsigned int vertical = 0; vertical <= getSelectedTileSet().texture.width;
          vertical += tileWidth) {
-        DrawLine(vertical, 0, vertical, tileSetList[selectedTileSetIndex].texture.height, gridColor);
+        DrawLine(vertical, 0, vertical, getSelectedTileSet().texture.height, gridColor);
     }
 
-    for (unsigned int horizontal = 0; horizontal <= tileSetList[selectedTileSetIndex].texture.height;
+    for (unsigned int horizontal = 0; horizontal <= getSelectedTileSet().texture.height;
          horizontal += tileHeight) {
-        DrawLine(0, horizontal, tileSetList[selectedTileSetIndex].texture.width, horizontal, gridColor);
+        DrawLine(0, horizontal, getSelectedTileSet().texture.width, horizontal, gridColor);
     }
 }
 
@@ -109,9 +114,9 @@ bool TileSet::isMouseInsideTileSetZone() const {
 }
 
 bool TileSet::isMouseInsideTileSet() const {
-    return worldPositionTileSet.x > 0 && worldPositionTileSet.x < tileSetList[selectedTileSetIndex].texture.width &&
+    return worldPositionTileSet.x > 0 && worldPositionTileSet.x < getSelectedTileSet().texture.width &&
            mousePosition.x < TILESET_AREA_WIDTH &&
-           worldPositionTileSet.y > 0 && worldPositionTileSet.y < tileSetList[selectedTileSetIndex].texture.height &&
+           worldPositionTileSet.y > 0 && worldPositionTileSet.y < getSelectedTileSet().texture.height &&
            mousePosition.y < GetScreenHeight() - gui->getHeight();
 }
 
@@ -133,4 +138,33 @@ void TileSet::zoomCamera(const float deltaTime) {
 void TileSet::moveCamera() {
     camera.target.x -= GetMouseDelta().x / camera.zoom;
     camera.target.y -= GetMouseDelta().y / camera.zoom;
+}
+
+void TileSet::selectTile() {
+    const int tileX = worldPositionTileSet.x / tileWidth;
+    const int tileY = worldPositionTileSet.y / tileHeight;
+    selectedCell = tileY * getSelectedTileSet().texture.width / tileWidth + tileX;
+
+    // ReSharper disable once CppDFAConstantConditions
+    if (getSelectedTileSet().isAutoTiling) {
+        // ReSharper disable once CppDFAUnreachableCode
+        const int autoTileBlock = selectedCell / 48;
+        selectedCell = autoTileBlock * 48;
+        getSelectedTileSet().selectedTilePosition.x = 0;
+        getSelectedTileSet().selectedTilePosition.y = autoTileBlock * 4 * tileHeight;
+    } else {
+        getSelectedTileSet().selectedTilePosition.x = tileX * tileWidth;
+        getSelectedTileSet().selectedTilePosition.y = tileY * tileHeight;
+    }
+}
+
+void TileSet::drawSelectedTile() const {
+    DrawRectangleLinesEx(
+        {
+            static_cast<float>(getSelectedTileSet().selectedTilePosition.x),
+            static_cast<float>(getSelectedTileSet().selectedTilePosition.y),
+            static_cast<float>(tileWidth),
+            static_cast<float>(tileHeight)
+        }, 2.0f, SELECTED_TILE_COLOR
+    );
 }

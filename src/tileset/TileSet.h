@@ -28,7 +28,10 @@ class TileSet {
     Vector2 mousePosition{};
     Vector2 worldPositionTileSet{};
 
+    bool isAutoTilingEnabled = false;
+
     std::vector<TileSetCell> selectedCells;
+    int selectedCell = 0;
 
     void drawGrid() const;
 
@@ -39,6 +42,18 @@ class TileSet {
     void zoomCamera(float deltaTime);
 
     void moveCamera();
+
+    void selectTile();
+
+    void drawSelectedTile() const;
+
+    TileSetTexture &getSelectedTileSet() {
+        return tileSetList[selectedTileSetIndex];
+    }
+
+    const TileSetTexture &getSelectedTileSet() const {
+        return tileSetList[selectedTileSetIndex];
+    }
 
 public:
     explicit TileSet();
