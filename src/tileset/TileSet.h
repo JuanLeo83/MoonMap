@@ -28,10 +28,10 @@ class TileSet {
     Vector2 mousePosition{};
     Vector2 worldPositionTileSet{};
 
-    bool isAutoTilingEnabled = false;
-
     std::vector<TileSetCell> selectedCells;
     int selectedCell = 0;
+
+    bool isDragging = false;
 
     void drawGrid() const;
 
@@ -54,6 +54,12 @@ class TileSet {
     const TileSetTexture &getSelectedTileSet() const {
         return tileSetList[selectedTileSetIndex];
     }
+
+    void startDrag();
+
+    void updateDrag();
+
+    void endDrag();
 
 public:
     explicit TileSet();
