@@ -31,6 +31,7 @@ int main() {
 
     while (!WindowShouldClose()) {
         // update
+        tileset->update();
 
         BeginDrawing();
         ClearBackground(Color{68, 71, 90});

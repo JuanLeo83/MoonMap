@@ -25,9 +25,20 @@ class TileSet {
     bool isGridEnabled = true;
     Color gridColor = DEFAULT_GRID_COLOR;
 
+    Vector2 mousePosition{};
+    Vector2 worldPositionTileSet{};
+
     std::vector<TileSetCell> selectedCells;
 
     void drawGrid() const;
+
+    bool isMouseInsideTileSetZone() const;
+
+    bool isMouseInsideTileSet() const;
+
+    void zoomCamera(float deltaTime);
+
+    void moveCamera();
 
 public:
     explicit TileSet();
@@ -37,6 +48,8 @@ public:
     void addTileSet(const std::string &texturePath);
 
     void deleteTileSet(int index);
+
+    void update();
 
     void draw() const;
 

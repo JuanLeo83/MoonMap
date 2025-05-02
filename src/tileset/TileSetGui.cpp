@@ -19,8 +19,8 @@ TileSetGui::TileSetGui(int &tileWidth, int &tileHeight, std::vector<TileSetTextu
 }
 
 void TileSetGui::draw() {
-    ImGui::SetNextWindowPos(ImVec2(0, GetScreenHeight() - MENU_BAR_HEIGHT * 2.0f), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(TILESET_AREA_WIDTH - 1, MENU_BAR_HEIGHT * 2.0f), ImGuiCond_Always);
+    ImGui::SetNextWindowPos(ImVec2(0, GetScreenHeight() - getHeight()), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(TILESET_AREA_WIDTH, getHeight()), ImGuiCond_Always);
 
     if (ImGui::Begin("TileSetControls", nullptr,
                      ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
@@ -72,4 +72,8 @@ void TileSetGui::selectTileSetDialog() const {
 
         ImGuiFileDialog::Instance()->Close();
     }
+}
+
+float TileSetGui::getHeight() const {
+    return MENU_BAR_HEIGHT * 2.0f;
 }

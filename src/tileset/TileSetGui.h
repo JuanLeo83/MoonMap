@@ -23,4 +23,6 @@ public:
     std::function<void(int)> onDeleteTileSet);
 
     void draw();
+
+    float getHeight() const;
 };
