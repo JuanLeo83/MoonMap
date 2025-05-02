@@ -6,9 +6,8 @@
 MenuBar::MenuBar(
     std::function<void(int)> onWidthChangedCallback,
     std::function<void(int)> onHeightChangedCallback)
-    : mapWidth(10),
-      onMapWidthChanged(std::move(onWidthChangedCallback)),
-      onMapHeightChanged(std::move(onHeightChangedCallback)) {
+    : mapWidth(10), onMapWidthChanged(std::move(onWidthChangedCallback)),
+      mapHeight(10), onMapHeightChanged(std::move(onHeightChangedCallback)) {
 }
 
 void MenuBar::draw() {

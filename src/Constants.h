@@ -6,7 +6,7 @@
 
 const std::string EMPTY_STRING = "";
 
-constexpr unsigned int MENU_BAR_HEIGHT = 35;
+constexpr unsigned int MENU_BAR_HEIGHT = 50;
 constexpr ImVec4 MENU_BAR_COLOR = {40.0f / 256, 42.0f / 256, 54.0f / 256, 1.0f};
 constexpr ImVec4 BUTTON_COLOR = {189.0f / 256, 147.0f / 256, 249.0f / 256, 1.0f};
 constexpr ImVec4 BUTTON_HOVERED_COLOR = {189.0f / 256, 118.0f / 256, 245.0f / 256, 1.0f};

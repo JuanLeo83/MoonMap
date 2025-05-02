@@ -24,7 +24,7 @@ int main() {
         [](const int newValue) {
             std::cout << "Map height: " << newValue << std::endl;
         }
-        );
+    );
 
     const auto tileset = new TileSet();
     // tileset->loadTexture("assets/AutotileExample.png");
@@ -57,11 +57,15 @@ int main() {
         ImGui::PushStyleColor(ImGuiCol_FrameBgActive, FRAME_BACKGROUND_ACTIVE_COLOR);
         ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, SELECTION_COLOR);
 
+        ImGui::PushStyleColor(ImGuiCol_TitleBg, MENU_BAR_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, SELECTION_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, BUTTON_COLOR);
+
         // draw
         tileset->draw();
         menuBar->draw();
 
-        ImGui::PopStyleColor(17);
+        ImGui::PopStyleColor(20);
 
         rlImGuiEnd();
         DrawFPS(GetScreenWidth() - 100, 10);
