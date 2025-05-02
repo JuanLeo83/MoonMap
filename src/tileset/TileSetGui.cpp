@@ -1,7 +1,5 @@
 #include "TileSetGui.h"
 
-#include <iostream>
-
 #include "imgui.h"
 #include "ImGuiFileDialog.h"
 #include "rlImGui.h"
@@ -11,11 +9,11 @@ TileSetGui::TileSetGui(int &tileWidth, int &tileHeight, std::vector<TileSetTextu
                        int &selectedTileSetIndex,
                        std::function<void(const std::string &)> onAddTileSet,
                        std::function<void(int)> onDeleteTileSet) : tileWidth(tileWidth),
-                                                                   tileHeight(tileHeight),
-                                                                   tileSetList(tileSetList),
-                                                                   selectedTileSetIndex(selectedTileSetIndex),
-                                                                   onAddTileSet(std::move(onAddTileSet)),
-                                                                   onDeleteTileSet(std::move(onDeleteTileSet)) {
+                                                                      tileHeight(tileHeight),
+                                                                      tileSetList(tileSetList),
+                                                                      selectedTileSetIndex(selectedTileSetIndex),
+                                                                      onAddTileSet(std::move(onAddTileSet)),
+                                                                      onDeleteTileSet(std::move(onDeleteTileSet)) {
 }
 
 void TileSetGui::draw() {
@@ -49,6 +47,10 @@ void TileSetGui::draw() {
             onDeleteTileSet(selectedTileSetIndex);
         }
         ImGui::EndDisabled();
+        if (!tileSetList.empty() && selectedTileSetIndex >= 0) {
+            ImGui::SameLine();
+            ImGui::Checkbox("Autotile", &tileSetList[selectedTileSetIndex].isAutoTiling);
+        }
 
         ImGui::SetNextItemWidth(100);
         ImGui::InputInt("Tile width", &tileWidth);

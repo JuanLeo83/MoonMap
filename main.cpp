@@ -42,6 +42,8 @@ int main() {
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, BUTTON_HOVERED_COLOR);
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, BUTTON_ACTIVE_COLOR);
 
+        ImGui::PushStyleColor(ImGuiCol_CheckMark, SELECTION_COLOR);
+
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, MENU_BAR_COLOR);
         ImGui::PushStyleColor(ImGuiCol_PopupBg, MENU_BAR_COLOR);
         ImGui::PushStyleColor(ImGuiCol_Border, MENU_BAR_COLOR);
@@ -66,7 +68,7 @@ int main() {
         tileset->draw();
         menuBar->draw();
 
-        ImGui::PopStyleColor(20);
+        ImGui::PopStyleColor(21);
 
         rlImGuiEnd();
         DrawFPS(GetScreenWidth() - 100, 10);

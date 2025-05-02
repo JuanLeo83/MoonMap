@@ -3,7 +3,6 @@
 #include <raylib.h>
 #include <vector>
 
-#include "TileSetCell.h"
 #include "TileSetGui.h"
 #include "TileSetTexture.h"
 #include "src/Constants.h"
@@ -27,10 +26,6 @@ class TileSet {
 
     Vector2 mousePosition{};
     Vector2 worldPositionTileSet{};
-
-    std::vector<TileSetCell> selectedCells;
-    int selectedCell = 0;
-
     bool isDragging = false;
 
     void drawGrid() const;
@@ -60,6 +55,10 @@ class TileSet {
     void updateDrag();
 
     void endDrag();
+
+    void setAutoTiling(const bool isAutoTiling) {
+        getSelectedTileSet().isAutoTiling = isAutoTiling;
+    }
 
 public:
     explicit TileSet();

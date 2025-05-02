@@ -9,7 +9,6 @@ TileSet::TileSet() : tileWidth(DEFAULT_TILE_WIDTH), tileHeight(DEFAULT_TILE_HEIG
     gui = new TileSetGui(tileWidth, tileHeight, tileSetList, selectedTileSetIndex,
                          [this](const std::string &path) { addTileSet(path); },
                          [this](const int index) { deleteTileSet(index); });
-    selectedCells = std::vector<TileSetCell>();
     mousePosition = GetMousePosition();
     worldPositionTileSet = GetScreenToWorld2D(mousePosition, camera);
 }
@@ -152,13 +151,12 @@ void TileSet::moveCamera() {
 void TileSet::selectTile() {
     const int tileX = worldPositionTileSet.x / tileWidth;
     const int tileY = worldPositionTileSet.y / tileHeight;
-    selectedCell = tileY * getSelectedTileSet().texture.width / tileWidth + tileX;
+    const int selectedCell = tileY * getSelectedTileSet().texture.width / tileWidth + tileX;
 
     // ReSharper disable once CppDFAConstantConditions
     if (getSelectedTileSet().isAutoTiling) {
         // ReSharper disable once CppDFAUnreachableCode
         const int autoTileBlock = selectedCell / 48;
-        selectedCell = autoTileBlock * 48;
         getSelectedTileSet().selectedTilePosition.x = 0;
         getSelectedTileSet().selectedTilePosition.y = autoTileBlock * 4 * tileHeight;
     } else {
@@ -230,18 +228,24 @@ void TileSet::updateDrag() {
 void TileSet::endDrag() {
     isDragging = false;
 
-    if (!getSelectedTileSet().isMultiSelecting) return;
-
+    if (!getSelectedTileSet().isMultiSelecting && !getSelectedTileSet().isAutoTiling) return;
 
     const float x = fminf(getSelectedTileSet().selectionStart.x, getSelectedTileSet().selectionEnd.x);
     const float y = fminf(getSelectedTileSet().selectionStart.y, getSelectedTileSet().selectionEnd.y);
     const float width = fabsf(getSelectedTileSet().selectionEnd.x - getSelectedTileSet().selectionStart.x);
     const float height = fabsf(getSelectedTileSet().selectionEnd.y - getSelectedTileSet().selectionStart.y);
 
-    int startTileX = floorf(x / tileWidth);
-    int startTileY = floorf(y / tileHeight);
-    int endTileX = ceilf((x + width) / tileWidth);
-    int endTileY = ceilf((y + height) / tileHeight);
+    int startTileX, startTileY, endTileX, endTileY;
+
+    if (!getSelectedTileSet().isMultiSelecting) {
+        startTileX = endTileX = floorf(getSelectedTileSet().selectionStart.x / tileWidth);
+        startTileY = endTileY = floorf(getSelectedTileSet().selectionStart.y / tileHeight);
+    } else {
+        startTileX = floorf(x / tileWidth);
+        startTileY = floorf(y / tileHeight);
+        endTileX = ceilf((x + width) / tileWidth);
+        endTileY = ceilf((y + height) / tileHeight);
+    }
 
     const int maxTileX = getSelectedTileSet().texture.width / tileWidth;
     const int maxTileY = getSelectedTileSet().texture.height / tileHeight;
@@ -253,19 +257,28 @@ void TileSet::endDrag() {
 
     getSelectedTileSet().selectedTiles.clear();
 
-    for (int row = startTileY; row < endTileY; row++) {
-        for (int column = startTileX; column < endTileX; column++) {
-            getSelectedTileSet().selectedTiles.push_back({
-                static_cast<float>(column * tileWidth),
-                static_cast<float>(row * tileHeight)
-            });
-        }
-    }
+    if (getSelectedTileSet().isAutoTiling) {
+        const int midTileX = (startTileX + endTileX) / 2;
+        const int midTileY = (startTileY + endTileY) / 2;
+        const int selectedCell = midTileY * getSelectedTileSet().texture.width / tileWidth + midTileX;
 
-    if (!getSelectedTileSet().selectedTiles.empty()) {
-        getSelectedTileSet().selectedTilePosition = getSelectedTileSet().selectedTiles[0];
-        const int tileX = static_cast<int>(getSelectedTileSet().selectedTiles[0].x / tileWidth);
-        const int tileY = static_cast<int>(getSelectedTileSet().selectedTiles[0].y / tileHeight);
-        selectedCell = tileY * (getSelectedTileSet().texture.width / tileWidth) + tileX;
+        const int autoTileBlock = selectedCell / 48;
+        getSelectedTileSet().selectedTilePosition.x = 0;
+        getSelectedTileSet().selectedTilePosition.y = autoTileBlock * 4 * tileHeight;
+
+        getSelectedTileSet().selectedTiles.push_back(getSelectedTileSet().selectedTilePosition);
+    } else {
+        for (int row = startTileY; row < endTileY; row++) {
+            for (int column = startTileX; column < endTileX; column++) {
+                getSelectedTileSet().selectedTiles.push_back({
+                    static_cast<float>(column * tileWidth),
+                    static_cast<float>(row * tileHeight)
+                });
+            }
+        }
+
+        if (!getSelectedTileSet().selectedTiles.empty()) {
+            getSelectedTileSet().selectedTilePosition = getSelectedTileSet().selectedTiles[0];
+        }
     }
 }
