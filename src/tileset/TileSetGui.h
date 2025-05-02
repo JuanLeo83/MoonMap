@@ -9,6 +9,7 @@ class TileSetGui {
 
     int &tileWidth;
     int &tileHeight;
+    bool &showGrid;
     std::vector<TileSetTexture> &tileSetList;
     int &selectedTileSetIndex;
 
@@ -18,11 +19,12 @@ class TileSetGui {
     void selectTileSetDialog() const;
 
 public:
-    TileSetGui(int &tileWidth, int &tileHeight, std::vector<TileSetTexture> &tileSetList,
-               int &selectedTileSetIndex, std::function<void(const std::string &)> onAddTileSet,
+    TileSetGui(int &tileWidth, int &tileHeight, bool &showGrid,
+               std::vector<TileSetTexture> &tileSetList, int &selectedTileSetIndex,
+               std::function<void(const std::string &)> onAddTileSet,
                std::function<void(int)> onDeleteTileSet);
 
     void draw();
 
-    float getHeight() const;
+    static float getHeight();
 };

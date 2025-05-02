@@ -6,7 +6,7 @@
 #include "src/Constants.h"
 
 TileSet::TileSet() : tileWidth(DEFAULT_TILE_WIDTH), tileHeight(DEFAULT_TILE_HEIGHT) {
-    gui = new TileSetGui(tileWidth, tileHeight, tileSetList, selectedTileSetIndex,
+    gui = new TileSetGui(tileWidth, tileHeight, showGrid, tileSetList, selectedTileSetIndex,
                          [this](const std::string &path) { addTileSet(path); },
                          [this](const int index) { deleteTileSet(index); });
     mousePosition = GetMousePosition();
@@ -50,10 +50,12 @@ void TileSet::deleteTileSet(int index) {
 void TileSet::update() {
     if (tileSetList.empty() || selectedTileSetIndex == -1) return;
 
+    auto &selectedTileSet = getSelectedTileSet();
+
     const float deltaTime = GetFrameTime();
 
-    camera.zoom = getSelectedTileSet().cameraZoom;
-    camera.target = getSelectedTileSet().cameraTarget;
+    camera.zoom = selectedTileSet.cameraZoom;
+    camera.target = selectedTileSet.cameraTarget;
 
     mousePosition = GetMousePosition();
     worldPositionTileSet = GetScreenToWorld2D(mousePosition, camera);
@@ -78,8 +80,8 @@ void TileSet::update() {
         }
     }
 
-    getSelectedTileSet().cameraZoom = camera.zoom;
-    getSelectedTileSet().cameraTarget = camera.target;
+    selectedTileSet.cameraZoom = camera.zoom;
+    selectedTileSet.cameraTarget = camera.target;
 }
 
 void TileSet::draw() const {
@@ -103,16 +105,18 @@ void TileSet::draw() const {
 }
 
 void TileSet::drawGrid() const {
-    if (tileWidth == 0 || tileHeight == 0) return;
+    if (!showGrid || tileWidth == 0 || tileHeight == 0) return;
 
-    for (unsigned int vertical = 0; vertical <= getSelectedTileSet().texture.width;
+    auto &selectedTileSet = getSelectedTileSet();
+
+    for (unsigned int vertical = 0; vertical <= selectedTileSet.texture.width;
          vertical += tileWidth) {
-        DrawLine(vertical, 0, vertical, getSelectedTileSet().texture.height, gridColor);
+        DrawLine(vertical, 0, vertical, selectedTileSet.texture.height, gridColor);
     }
 
-    for (unsigned int horizontal = 0; horizontal <= getSelectedTileSet().texture.height;
+    for (unsigned int horizontal = 0; horizontal <= selectedTileSet.texture.height;
          horizontal += tileHeight) {
-        DrawLine(0, horizontal, getSelectedTileSet().texture.width, horizontal, gridColor);
+        DrawLine(0, horizontal, selectedTileSet.texture.width, horizontal, gridColor);
     }
 }
 
@@ -122,9 +126,10 @@ bool TileSet::isMouseInsideTileSetZone() const {
 }
 
 bool TileSet::isMouseInsideTileSet() const {
-    return worldPositionTileSet.x > 0 && worldPositionTileSet.x < getSelectedTileSet().texture.width &&
+    auto &selectedTileSet = getSelectedTileSet();
+    return worldPositionTileSet.x > 0 && worldPositionTileSet.x < selectedTileSet.texture.width &&
            mousePosition.x < TILESET_AREA_WIDTH &&
-           worldPositionTileSet.y > 0 && worldPositionTileSet.y < getSelectedTileSet().texture.height &&
+           worldPositionTileSet.y > 0 && worldPositionTileSet.y < selectedTileSet.texture.height &&
            mousePosition.y < GetScreenHeight() - gui->getHeight();
 }
 
@@ -132,7 +137,7 @@ void TileSet::zoomCamera(const float deltaTime) {
     if (GetMouseWheelMoveV().y != 0) {
         const Vector2 worldBeforeZoom = GetScreenToWorld2D(mousePosition, camera);
 
-        camera.zoom += GetMouseWheelMoveV().y * deltaTime;
+        camera.zoom += GetMouseWheelMoveV().y * 2 * deltaTime;
 
         if (camera.zoom < 0.25f) camera.zoom = 0.25f;
 
@@ -149,37 +154,37 @@ void TileSet::moveCamera() {
 }
 
 void TileSet::selectTile() {
+    auto &selectedTileSet = getSelectedTileSet();
     const int tileX = worldPositionTileSet.x / tileWidth;
     const int tileY = worldPositionTileSet.y / tileHeight;
-    const int selectedCell = tileY * getSelectedTileSet().texture.width / tileWidth + tileX;
+    const int selectedCell = tileY * selectedTileSet.texture.width / tileWidth + tileX;
 
-    // ReSharper disable once CppDFAConstantConditions
-    if (getSelectedTileSet().isAutoTiling) {
-        // ReSharper disable once CppDFAUnreachableCode
+    if (selectedTileSet.isAutoTiling) {
         const int autoTileBlock = selectedCell / 48;
-        getSelectedTileSet().selectedTilePosition.x = 0;
-        getSelectedTileSet().selectedTilePosition.y = autoTileBlock * 4 * tileHeight;
+        selectedTileSet.selectedTilePosition.x = 0;
+        selectedTileSet.selectedTilePosition.y = autoTileBlock * 4 * tileHeight;
     } else {
-        getSelectedTileSet().selectedTilePosition.x = tileX * tileWidth;
-        getSelectedTileSet().selectedTilePosition.y = tileY * tileHeight;
-        getSelectedTileSet().selectedTiles.clear();
-        getSelectedTileSet().selectedTiles.push_back(getSelectedTileSet().selectedTilePosition);
+        selectedTileSet.selectedTilePosition.x = tileX * tileWidth;
+        selectedTileSet.selectedTilePosition.y = tileY * tileHeight;
+        selectedTileSet.selectedTiles.clear();
+        selectedTileSet.selectedTiles.push_back(selectedTileSet.selectedTilePosition);
     }
 }
 
 void TileSet::drawSelectedTile() const {
-    if (isDragging && getSelectedTileSet().isMultiSelecting) {
-        const float x = fminf(getSelectedTileSet().selectionStart.x, getSelectedTileSet().selectionEnd.x);
-        const float y = fminf(getSelectedTileSet().selectionStart.y, getSelectedTileSet().selectionEnd.y);
-        const float width = fabsf(getSelectedTileSet().selectionEnd.x - getSelectedTileSet().selectionStart.x);
-        const float height = fabsf(getSelectedTileSet().selectionEnd.y - getSelectedTileSet().selectionStart.y);
+    auto &selectedTileSet = getSelectedTileSet();
+    if (isDragging && selectedTileSet.isMultiSelecting) {
+        const float x = fminf(selectedTileSet.selectionStart.x, selectedTileSet.selectionEnd.x);
+        const float y = fminf(selectedTileSet.selectionStart.y, selectedTileSet.selectionEnd.y);
+        const float width = fabsf(selectedTileSet.selectionEnd.x - selectedTileSet.selectionStart.x);
+        const float height = fabsf(selectedTileSet.selectionEnd.y - selectedTileSet.selectionStart.y);
 
         DrawRectangleLinesEx({x, y, width, height}, 2.0f, SELECTED_TILE_COLOR);
         return;
     }
 
-    if (!getSelectedTileSet().selectedTiles.empty()) {
-        for (const auto &[x, y]: getSelectedTileSet().selectedTiles) {
+    if (!selectedTileSet.selectedTiles.empty()) {
+        for (const auto &[x, y]: selectedTileSet.selectedTiles) {
             DrawRectangleLinesEx(
                 {
                     x,
@@ -194,8 +199,8 @@ void TileSet::drawSelectedTile() const {
     } else {
         DrawRectangleLinesEx(
             {
-                static_cast<float>(getSelectedTileSet().selectedTilePosition.x),
-                static_cast<float>(getSelectedTileSet().selectedTilePosition.y),
+                static_cast<float>(selectedTileSet.selectedTilePosition.x),
+                static_cast<float>(selectedTileSet.selectedTilePosition.y),
                 static_cast<float>(tileWidth),
                 static_cast<float>(tileHeight)
             }, 2.0f, SELECTED_TILE_COLOR
@@ -204,10 +209,11 @@ void TileSet::drawSelectedTile() const {
 }
 
 void TileSet::startDrag() {
+    auto &selectedTileSet = getSelectedTileSet();
     isDragging = true;
-    getSelectedTileSet().isMultiSelecting = false;
-    getSelectedTileSet().selectionStart = worldPositionTileSet;
-    getSelectedTileSet().selectionEnd = worldPositionTileSet;
+    selectedTileSet.isMultiSelecting = false;
+    selectedTileSet.selectionStart = worldPositionTileSet;
+    selectedTileSet.selectionEnd = worldPositionTileSet;
 
     selectTile();
 }
@@ -215,31 +221,34 @@ void TileSet::startDrag() {
 void TileSet::updateDrag() {
     if (!isMouseInsideTileSet()) return;
 
-    getSelectedTileSet().selectionEnd = worldPositionTileSet;
+    auto &selectedTileSet = getSelectedTileSet();
 
-    const float diffX = fabs(getSelectedTileSet().selectionEnd.x - getSelectedTileSet().selectionStart.x);
-    const float diffY = fabs(getSelectedTileSet().selectionEnd.y - getSelectedTileSet().selectionStart.y);
+    selectedTileSet.selectionEnd = worldPositionTileSet;
+
+    const float diffX = fabs(selectedTileSet.selectionEnd.x - selectedTileSet.selectionStart.x);
+    const float diffY = fabs(selectedTileSet.selectionEnd.y - selectedTileSet.selectionStart.y);
 
     if (diffX > tileWidth / 2 || diffY > tileHeight / 2) {
-        getSelectedTileSet().isMultiSelecting = true;
+        selectedTileSet.isMultiSelecting = true;
     }
 }
 
 void TileSet::endDrag() {
+    auto &selectedTileSet = getSelectedTileSet();
     isDragging = false;
 
-    if (!getSelectedTileSet().isMultiSelecting && !getSelectedTileSet().isAutoTiling) return;
+    if (!selectedTileSet.isMultiSelecting && !selectedTileSet.isAutoTiling) return;
 
-    const float x = fminf(getSelectedTileSet().selectionStart.x, getSelectedTileSet().selectionEnd.x);
-    const float y = fminf(getSelectedTileSet().selectionStart.y, getSelectedTileSet().selectionEnd.y);
-    const float width = fabsf(getSelectedTileSet().selectionEnd.x - getSelectedTileSet().selectionStart.x);
-    const float height = fabsf(getSelectedTileSet().selectionEnd.y - getSelectedTileSet().selectionStart.y);
+    const float x = fminf(selectedTileSet.selectionStart.x, selectedTileSet.selectionEnd.x);
+    const float y = fminf(selectedTileSet.selectionStart.y, selectedTileSet.selectionEnd.y);
+    const float width = fabsf(selectedTileSet.selectionEnd.x - selectedTileSet.selectionStart.x);
+    const float height = fabsf(selectedTileSet.selectionEnd.y - selectedTileSet.selectionStart.y);
 
     int startTileX, startTileY, endTileX, endTileY;
 
-    if (!getSelectedTileSet().isMultiSelecting) {
-        startTileX = endTileX = floorf(getSelectedTileSet().selectionStart.x / tileWidth);
-        startTileY = endTileY = floorf(getSelectedTileSet().selectionStart.y / tileHeight);
+    if (!selectedTileSet.isMultiSelecting) {
+        startTileX = endTileX = floorf(selectedTileSet.selectionStart.x / tileWidth);
+        startTileY = endTileY = floorf(selectedTileSet.selectionStart.y / tileHeight);
     } else {
         startTileX = floorf(x / tileWidth);
         startTileY = floorf(y / tileHeight);
@@ -247,38 +256,38 @@ void TileSet::endDrag() {
         endTileY = ceilf((y + height) / tileHeight);
     }
 
-    const int maxTileX = getSelectedTileSet().texture.width / tileWidth;
-    const int maxTileY = getSelectedTileSet().texture.height / tileHeight;
+    const int maxTileX = selectedTileSet.texture.width / tileWidth;
+    const int maxTileY = selectedTileSet.texture.height / tileHeight;
 
     startTileX = Clamp(startTileX, 0, maxTileX);
     startTileY = Clamp(startTileY, 0, maxTileY);
     endTileX = Clamp(endTileX, 0, maxTileX);
     endTileY = Clamp(endTileY, 0, maxTileY);
 
-    getSelectedTileSet().selectedTiles.clear();
+    selectedTileSet.selectedTiles.clear();
 
-    if (getSelectedTileSet().isAutoTiling) {
+    if (selectedTileSet.isAutoTiling) {
         const int midTileX = (startTileX + endTileX) / 2;
         const int midTileY = (startTileY + endTileY) / 2;
-        const int selectedCell = midTileY * getSelectedTileSet().texture.width / tileWidth + midTileX;
+        const int selectedCell = midTileY * selectedTileSet.texture.width / tileWidth + midTileX;
 
         const int autoTileBlock = selectedCell / 48;
-        getSelectedTileSet().selectedTilePosition.x = 0;
-        getSelectedTileSet().selectedTilePosition.y = autoTileBlock * 4 * tileHeight;
+        selectedTileSet.selectedTilePosition.x = 0;
+        selectedTileSet.selectedTilePosition.y = autoTileBlock * 4 * tileHeight;
 
-        getSelectedTileSet().selectedTiles.push_back(getSelectedTileSet().selectedTilePosition);
+        selectedTileSet.selectedTiles.push_back(selectedTileSet.selectedTilePosition);
     } else {
         for (int row = startTileY; row < endTileY; row++) {
             for (int column = startTileX; column < endTileX; column++) {
-                getSelectedTileSet().selectedTiles.push_back({
+                selectedTileSet.selectedTiles.push_back({
                     static_cast<float>(column * tileWidth),
                     static_cast<float>(row * tileHeight)
                 });
             }
         }
 
-        if (!getSelectedTileSet().selectedTiles.empty()) {
-            getSelectedTileSet().selectedTilePosition = getSelectedTileSet().selectedTiles[0];
+        if (!selectedTileSet.selectedTiles.empty()) {
+            selectedTileSet.selectedTilePosition = selectedTileSet.selectedTiles[0];
         }
     }
 }

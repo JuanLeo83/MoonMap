@@ -58,7 +58,7 @@ void MenuBar::drawMapWidthSlider() {
     ImGui::AlignTextToFramePadding();
     ImGui::Text("Map width:");
     ImGui::SameLine();
-    ImGui::SetNextItemWidth(50.0f);
+    ImGui::SetNextItemWidth(40);
     if (ImGui::DragInt("##MapWidth", &mapWidth, 1.0f, 0, INT_MAX)) {
         if (onMapWidthChanged) {
             onMapWidthChanged(mapWidth);
@@ -70,7 +70,7 @@ void MenuBar::drawMapHeightSlider() {
     ImGui::AlignTextToFramePadding();
     ImGui::Text("Map height:");
     ImGui::SameLine();
-    ImGui::SetNextItemWidth(50.0f);
+    ImGui::SetNextItemWidth(40);
     if (ImGui::DragInt("##MapHeight", &mapHeight, 1.0f, 0, INT_MAX)) {
         if (onMapHeightChanged) {
             onMapHeightChanged(mapHeight);

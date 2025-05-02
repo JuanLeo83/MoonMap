@@ -5,15 +5,16 @@
 #include "rlImGui.h"
 #include "src/Constants.h"
 
-TileSetGui::TileSetGui(int &tileWidth, int &tileHeight, std::vector<TileSetTexture> &tileSetList,
-                       int &selectedTileSetIndex,
+TileSetGui::TileSetGui(int &tileWidth, int &tileHeight, bool &showGrid,
+                       std::vector<TileSetTexture> &tileSetList, int &selectedTileSetIndex,
                        std::function<void(const std::string &)> onAddTileSet,
                        std::function<void(int)> onDeleteTileSet) : tileWidth(tileWidth),
-                                                                      tileHeight(tileHeight),
-                                                                      tileSetList(tileSetList),
-                                                                      selectedTileSetIndex(selectedTileSetIndex),
-                                                                      onAddTileSet(std::move(onAddTileSet)),
-                                                                      onDeleteTileSet(std::move(onDeleteTileSet)) {
+                                                                   tileHeight(tileHeight),
+                                                                   showGrid(showGrid),
+                                                                   tileSetList(tileSetList),
+                                                                   selectedTileSetIndex(selectedTileSetIndex),
+                                                                   onAddTileSet(std::move(onAddTileSet)),
+                                                                   onDeleteTileSet(std::move(onDeleteTileSet)) {
 }
 
 void TileSetGui::draw() {
@@ -47,16 +48,33 @@ void TileSetGui::draw() {
             onDeleteTileSet(selectedTileSetIndex);
         }
         ImGui::EndDisabled();
+
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("Tile width:");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(40);
+        ImGui::DragInt("##TileWidth", &tileWidth, 1.0f, 0, INT_MAX);
+
+        ImGui::SameLine();
+        ImGui::Spacing();
+        ImGui::SameLine();
+        ImGui::Spacing();
+        ImGui::SameLine();
+
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("Tile height:");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(40);
+        ImGui::DragInt("##TileHeight", &tileHeight, 1.0f, 0, INT_MAX);
+
+        if (!tileSetList.empty() && selectedTileSetIndex >= 0) {
+            ImGui::Checkbox("Show grid", &showGrid);
+        }
+
         if (!tileSetList.empty() && selectedTileSetIndex >= 0) {
             ImGui::SameLine();
             ImGui::Checkbox("Autotile", &tileSetList[selectedTileSetIndex].isAutoTiling);
         }
-
-        ImGui::SetNextItemWidth(100);
-        ImGui::InputInt("Tile width", &tileWidth);
-
-        ImGui::SetNextItemWidth(100);
-        ImGui::InputInt("Tile height", &tileHeight);
     }
 
     selectTileSetDialog();
@@ -76,6 +94,6 @@ void TileSetGui::selectTileSetDialog() const {
     }
 }
 
-float TileSetGui::getHeight() const {
-    return MENU_BAR_HEIGHT * 2.0f;
+float TileSetGui::getHeight() {
+    return MENU_BAR_HEIGHT * 2.1f;
 }

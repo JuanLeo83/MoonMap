@@ -21,7 +21,7 @@ class TileSet {
     int tileWidth;
     int tileHeight;
 
-    bool isGridEnabled = true;
+    bool showGrid = true;
     Color gridColor = DEFAULT_GRID_COLOR;
 
     Vector2 mousePosition{};
@@ -74,6 +74,6 @@ public:
     void draw() const;
 
     void toggleGrid() {
-        isGridEnabled = !isGridEnabled;
+        showGrid = !showGrid;
     }
 };
